@@ -189,17 +189,17 @@ def prediction():
     criterion = nn.CrossEntropyLoss()
     ensemble_accuracy=[]
 
-    trainset,trainlabel,testset, testlabel = get_TVT(dir)
-    models = get_models(len(trainlabel))
+    trainset,valset,testset= get_TVT(dir_image)
+    models = get_models()
     for model in models:
-        optimizer = optim.Adam(model.parameters(),lr=1e-4)
+        optimizer = optim.Adam(model.parameters(),lr=lr)
         exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=9, gamma=0.1)
-        model = train_model(trainset,trainlabel, model, criterion, optimizer, exp_lr_scheduler,num_epochs=10)
+        model = train_model(trainset, valset, model, criterion, optimizer, exp_lr_scheduler,num_epoch)
 
-        print(test_acc(model,testset,testlabel))
+        print(test_acc(model,testset))
     
-        train_X, train_Y = get_weighted_score_ft(model,trainset,trainlabel,num_class = len(trainset))
-        test_X, test_Y = get_weighted_score_ft(model,testset,testlabel,num_class = len(testset))
+        train_X, train_Y = get_weighted_score_ft(model,trainset)
+        test_X, test_Y = get_weighted_score_ft(model,testset)
     
         #predicting using SVM
     model_svc = SVC(decision_function_shape = 'ovr', C = 500, kernel = 'rbf')
